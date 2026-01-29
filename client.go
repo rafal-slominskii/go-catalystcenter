@@ -198,8 +198,6 @@ func (client Client) NewReq(method, uri string, body io.Reader, mods ...func(*Re
 //	req := client.NewReq("GET", "/dna/intent/api/v2/site", nil)
 //	res, _ := client.Do(req)
 func (client *Client) Do(req Req) (Res, error) {
-	// add token
-	req.HttpReq.Header.Add("X-Auth-Token", client.Token)
 	req.HttpReq.Header.Add("Content-Type", "application/json")
 	// retain the request body across multiple attempts
 	var body []byte
@@ -224,6 +222,7 @@ func (client *Client) Do(req Req) (Res, error) {
 	}
 
 	for attempts := 0; ; attempts++ {
+		req.HttpReq.Header.Set("X-Auth-Token", client.Token)
 		req.HttpReq.Body = io.NopCloser(bytes.NewBuffer(body))
 		if req.LogPayload {
 			log.Printf("[DEBUG] HTTP Request: %s, %s, %s", req.HttpReq.Method, req.HttpReq.URL, req.HttpReq.Body)
@@ -336,7 +335,7 @@ func (client *Client) WaitTask(req *Req, res *Res) (Res, error) {
 			} else {
 				taskReq, _ = http.NewRequest("GET", client.Url+"/dna/platform/management/business-api/v1/execution-status/"+id, nil)
 			}
-			taskReq.Header.Add("X-Auth-Token", client.Token)
+			taskReq.Header.Set("X-Auth-Token", client.Token)
 			httpTaskRes, err := client.HttpClient.Do(taskReq)
 			if err != nil {
 				return Res{}, err
