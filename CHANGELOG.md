@@ -1,4 +1,4 @@
-## 0.1.12 (Unreleased)
+## 0.2.0 (unreleased)
 
 - Add `UserAgent` option to set a custom HTTP User-Agent string on authentication, API, and async task-polling requests
 
